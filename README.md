@@ -1,39 +1,70 @@
-<!-- 
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+## flutter_split_view
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/guides/libraries/writing-package-pages). 
+A Navigator 2.0 based Flutter widget that automatically splits the screen into two views based on available space.
 
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-library-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/developing-packages). 
--->
-
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
-
-## Features
-
-TODO: List what your package can do. Maybe include images, gifs, or videos.
-
-## Getting started
-
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
-
-## Usage
-
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder. 
+### Usage
 
 ```dart
-const like = 'sample';
+MaterialApp(
+    title: 'SplitView Demo',
+    home: SplitView.material(
+        child: MainPage(),
+    ),
+);
 ```
 
-## Additional information
+Cupertino: 
 
-TODO: Tell users more about the package: where to find more information, how to 
-contribute to the package, how to file issues, what response they can expect 
-from the package authors, and more.
+```dart
+CupertinoApp(
+    title: 'SplitView Demo',
+    home: SplitView.cupertino(
+        child: MainPage(),
+    ),
+);
+```
+
+### Navigating
+
+#### Push
+
+```dart
+SplitView.of(context).push(SecondPage());
+```
+
+Push with an optional title, which will be used as the back button's title in
+Cupertino:
+
+```dart
+SplitView.of(context).push(
+    SecondPage(),
+    title: 'Second',
+);
+```
+
+
+#### Pop
+
+```dart
+SplitView.of(context).pop();
+```
+
+Pop until the n-th page.
+
+```dart
+SplitView.of(context).popUntil(1);
+```
+
+#### Set the page displayed in the secondary view
+
+```dart
+SplitView.of(context).setSecondary(SecondPage());
+```
+
+This will clear the stack and push the new page, making it the second page in the stack.
+
+### Example
+
+
+- [example/material.dart]()
+- [example/cupertino.dart]()
