@@ -2,6 +2,8 @@
 
 A Navigator 2.0 based Flutter widget that automatically splits the screen into two views based on available space.
 
+![Demo](https://raw.githubusercontent.com/TerminalStudio/flutter_split_view/main/media/demo.gif?token=GHSAT0AAAAAABIZ4MCR753WLCN4QECYUMSSYPJPDSQ)
+
 ### Usage
 
 ```dart
@@ -49,7 +51,7 @@ SplitView.of(context).push(
 SplitView.of(context).pop();
 ```
 
-Pop until the n-th page.
+Pop until the n-th page:
 
 ```dart
 SplitView.of(context).popUntil(1);
@@ -66,5 +68,5 @@ This will clear the stack and push the new page, making it the second page in th
 ### Example
 
 
-- [example/material.dart]()
-- [example/cupertino.dart]()
+- [example/lib/main.dart](https://github.com/TerminalStudio/flutter_split_view/blob/main/example/lib/main.dart)
+- [example/lib/main_cupertino.dart](https://github.com/TerminalStudio/flutter_split_view/blob/main/example/lib/main_cupertino.dart)
