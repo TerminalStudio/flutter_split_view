@@ -65,6 +65,12 @@ SplitView.of(context).setSecondary(SecondPage());
 
 This will clear the stack and push the new page, making it the second page in the stack.
 
+### Get whether the secondary view is visible
+
+```dart 
+SplitView.of(context).isSecondaryVisible;
+```
+
 ### Example
 
 

@@ -132,6 +132,8 @@ class SplitViewState extends State<SplitView> {
 
   final _pageConfigs = <_PageConfig>[];
 
+  var _splitted = false;
+
   @override
   void initState() {
     _pageConfigs.add(
@@ -145,9 +147,9 @@ class SplitViewState extends State<SplitView> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constrains) {
-        final shouldSplit = constrains.maxWidth >= widget.breakpoint;
+        _splitted = constrains.maxWidth >= widget.breakpoint;
 
-        if (!shouldSplit) {
+        if (!_splitted) {
           return Navigator(
             pages: _pages,
             onPopPage: _onPopPage,
@@ -277,6 +279,10 @@ class SplitViewState extends State<SplitView> {
     );
 
     setState(_updatePages);
+  }
+
+  bool get isSecondaryVisible {
+    return _splitted;
   }
 
   void _updatePages() {
