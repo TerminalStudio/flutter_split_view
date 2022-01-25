@@ -303,11 +303,11 @@ class SplitViewState extends State<SplitView> {
   }
 
   bool _onPopPage(Route<dynamic> route, dynamic result) {
-    if (_pages.length <= 1) {
+    if (_pageConfigs.length <= 1) {
       return false;
     }
     if (route.didPop(result)) {
-      _pages.removeLast();
+      _pageConfigs.removeLast();
       return true;
     }
     return false;
