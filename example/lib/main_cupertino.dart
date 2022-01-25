@@ -119,7 +119,7 @@ class SecondPage extends StatelessWidget {
               CupertinoButton(
                 child: Text('pop'),
                 onPressed: () {
-                  SplitView.of(context).pop();
+                  Navigator.of(context).pop();
                 },
               ),
             ],
@@ -146,7 +146,7 @@ class ThirdPage extends StatelessWidget {
           return CupertinoButton(
             child: Text('pop'),
             onPressed: () {
-              SplitView.of(context).pop();
+              Navigator.of(context).pop();
             },
           );
         }),

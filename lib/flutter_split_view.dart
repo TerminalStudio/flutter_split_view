@@ -404,6 +404,8 @@ class SplitViewState extends State<SplitView> {
     }
     if (route.didPop(result)) {
       _sidePageConfigs.removeLast();
+      // _markDirty();
+      setState(_markDirty);
       return true;
     }
     return false;
