@@ -386,7 +386,6 @@ class SplitViewState extends State<SplitView> {
   }
 
   bool _onPopMain(Route<dynamic> route, dynamic result) {
-    print('_onPopMain');
     if (_mainPageConfigs.length <= 1) {
       return false;
     }
@@ -398,7 +397,6 @@ class SplitViewState extends State<SplitView> {
   }
 
   bool _onPopSide(Route<dynamic> route, dynamic result) {
-    print('_onPopSide');
     if (_sidePageConfigs.isEmpty) {
       return false;
     }
