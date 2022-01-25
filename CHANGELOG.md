@@ -1,3 +1,7 @@
+## 0.1.1
+
+* Fix pop
+
 ## 0.1.0
 
 * Add isSecondaryVisible property to SplitView
