@@ -17,6 +17,7 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       home: SplitView.cupertino(
         child: MainPage(),
+        title: 'Home',
         placeholder: PlaceholderPage(),
       ),
     );
@@ -35,14 +36,37 @@ class MainPage extends StatelessWidget {
         middle: Text('Home'),
       ),
       child: Center(
-        child: CupertinoButton(
-          child: Text('click'),
-          onPressed: () {
-            SplitView.of(context).setSecondary(
-              SecondPage(),
-              title: 'Second',
-            );
-          },
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CupertinoButton(
+              child: Text('pushMain'),
+              onPressed: () {
+                SplitView.of(context).pushMain(
+                  SecondPage(),
+                  title: 'Second',
+                );
+              },
+            ),
+            CupertinoButton(
+              child: Text('pushSide'),
+              onPressed: () {
+                SplitView.of(context).pushSide(
+                  SecondPage(),
+                  title: 'Second',
+                );
+              },
+            ),
+            CupertinoButton(
+              child: Text('setSide'),
+              onPressed: () {
+                SplitView.of(context).setSide(
+                  SecondPage(),
+                  title: 'Second',
+                );
+              },
+            ),
+          ],
         ),
       ),
     );
@@ -66,18 +90,36 @@ class SecondPage extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               CupertinoButton(
-                child: Text('back'),
+                child: Text('pushMain'),
                 onPressed: () {
-                  SplitView.of(context).pop();
-                },
-              ),
-              CupertinoButton(
-                child: Text('forward'),
-                onPressed: () {
-                  SplitView.of(context).push(
+                  SplitView.of(context).pushMain(
                     ThirdPage(),
                     title: 'Third',
                   );
+                },
+              ),
+              CupertinoButton(
+                child: Text('pushSide'),
+                onPressed: () {
+                  SplitView.of(context).pushSide(
+                    ThirdPage(),
+                    title: 'Third',
+                  );
+                },
+              ),
+              CupertinoButton(
+                child: Text('setSide'),
+                onPressed: () {
+                  SplitView.of(context).setSide(
+                    ThirdPage(),
+                    title: 'Third',
+                  );
+                },
+              ),
+              CupertinoButton(
+                child: Text('pop'),
+                onPressed: () {
+                  SplitView.of(context).pop();
                 },
               ),
             ],
@@ -102,7 +144,7 @@ class ThirdPage extends StatelessWidget {
       child: Center(
         child: Builder(builder: (context) {
           return CupertinoButton(
-            child: Text('back'),
+            child: Text('pop'),
             onPressed: () {
               SplitView.of(context).pop();
             },

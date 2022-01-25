@@ -128,18 +128,32 @@ class SplitView extends StatefulWidget {
 }
 
 class SplitViewState extends State<SplitView> {
-  var _pages = <Page>[];
+  /// Configuration of pages in the main view.
+  final _mainPageConfigs = <_PageConfig>[];
 
-  final _pageConfigs = <_PageConfig>[];
+  /// Configuration of pages in the side view.
+  final _sidePageConfigs = <_PageConfig>[];
 
+  /// List of pages that are actually visible in the main view.
+  var _mainPages = <Page>[];
+
+  /// List of pages that are actually visible in the side view.
+  var _sidePages = <Page>[];
+
+  /// Whether the side view is visible.
   var _splitted = false;
+
+  /// Whether the configuration has changed and the pages need to be rebuilt.
+  var _dirty = true;
 
   @override
   void initState() {
-    _pageConfigs.add(
+    _mainPageConfigs.add(
       _PageConfig(child: widget.child, name: widget.title),
     );
-    _updatePages();
+
+    _updatePagesIfNeeded();
+
     super.initState();
   }
 
@@ -149,10 +163,12 @@ class SplitViewState extends State<SplitView> {
       builder: (context, constrains) {
         _splitted = constrains.maxWidth >= widget.breakpoint;
 
+        _updatePagesIfNeeded();
+
         if (!_splitted) {
           return Navigator(
-            pages: _pages,
-            onPopPage: _onPopPage,
+            pages: _mainPages,
+            onPopPage: _onPopTop,
           );
         }
 
@@ -161,8 +177,8 @@ class SplitViewState extends State<SplitView> {
             SizedBox(
               width: widget.childWidth,
               child: Navigator(
-                pages: [_pages.first],
-                onPopPage: _onPopPage,
+                pages: _mainPages,
+                onPopPage: _onPopMain,
               ),
             ),
             const VerticalDivider(
@@ -171,7 +187,7 @@ class SplitViewState extends State<SplitView> {
             Expanded(
               child: ClipRect(
                 clipBehavior: Clip.hardEdge,
-                child: _buildSecondaryView(),
+                child: _buildSideView(),
               ),
             ),
           ],
@@ -180,18 +196,19 @@ class SplitViewState extends State<SplitView> {
     );
   }
 
-  Widget _buildSecondaryView() {
-    if (_pages.length == 1) {
+  Widget _buildSideView() {
+    if (_sidePages.isEmpty) {
       return widget.placeholder ?? Container();
     }
 
     return Navigator(
-      pages: _pages.sublist(1),
-      onPopPage: _onPopPage,
+      pages: _sidePages,
+      onPopPage: _onPopSide,
     );
   }
 
-  void push(
+  /// Push a new page to the side view.
+  void pushMain(
     Widget page, {
     String? title,
     Object? arguments,
@@ -206,34 +223,20 @@ class SplitViewState extends State<SplitView> {
       fullscreenDialog: fullscreenDialog,
     );
 
-    _pageConfigs.add(pageConfig);
+    _mainPageConfigs.add(pageConfig);
 
-    setState(_updatePages);
+    setState(_markDirty);
   }
 
-  void pop() {
-    if (_pageConfigs.length == 1) {
-      return;
-    }
-
-    _pageConfigs.removeLast();
-
-    setState(_updatePages);
-  }
-
-  /// Number of pages in the stack.
-  int get pageCount => _pageConfigs.length;
-
-  /// Replaces the page at [index] with [page].
-  void replace({
-    required int index,
-    required Widget page,
+  /// Push a new page to the side view.
+  void pushSide(
+    Widget page, {
     String? title,
     Object? arguments,
     String? restorationId,
     bool? fullscreenDialog,
   }) {
-    _pageConfigs[index] = _PageConfig(
+    final pageConfig = _PageConfig(
       child: page,
       name: title,
       arguments: arguments,
@@ -241,34 +244,62 @@ class SplitViewState extends State<SplitView> {
       fullscreenDialog: fullscreenDialog,
     );
 
-    setState(_updatePages);
+    _sidePageConfigs.add(pageConfig);
+
+    setState(_markDirty);
   }
 
-  /// Pops the pages until the [index]-th is reached.
-  void popUntil(int index) {
-    if (index < 0 || index >= pageCount) {
-      throw ArgumentError('Index $index is out of bounds');
-    }
-
-    while (pageCount - 1 > index) {
-      _pageConfigs.removeLast();
-    }
-
-    setState(_updatePages);
+  /// Pop a page from the top of the stack.
+  bool pop() {
+    return popSide() || popMain();
   }
 
-  /// Sets the page displayed at seconday view. This clears all other pages on
-  /// top of the page displayed at secondary view (aka 2nd page in the stack).
-  void setSecondary(
+  /// Pop a page from the top of the main view.
+  bool popMain() {
+    if (_mainPageConfigs.length <= 1) {
+      return false;
+    }
+
+    _mainPageConfigs.removeLast();
+
+    setState(_markDirty);
+
+    return true;
+  }
+
+  /// Pop a page from the side view.
+  bool popSide() {
+    if (_sidePageConfigs.isEmpty) {
+      return false;
+    }
+
+    _sidePageConfigs.removeLast();
+
+    setState(_markDirty);
+
+    return true;
+  }
+
+  /// Number of pages in the stack.
+  int get pageCount => mainPageCount + sidePageCount;
+
+  /// Number of pages in the main view.
+  int get mainPageCount => _mainPageConfigs.length;
+
+  /// Number of pages in the side view.
+  int get sidePageCount => _sidePageConfigs.length;
+
+  /// Sets the page displayed in the main view.
+  void setMain(
     Widget page, {
     String? title,
     Object? arguments,
     String? restorationId,
     bool? fullscreenDialog,
   }) {
-    _pageConfigs.removeRange(1, _pageConfigs.length);
+    _mainPageConfigs.clear();
 
-    _pageConfigs.add(
+    _mainPageConfigs.add(
       _PageConfig(
         child: page,
         name: title,
@@ -278,17 +309,65 @@ class SplitViewState extends State<SplitView> {
       ),
     );
 
-    setState(_updatePages);
+    setState(_markDirty);
   }
 
-  bool get isSecondaryVisible {
+  /// Sets the page displayed in the side view.
+  void setSide(
+    Widget page, {
+    String? title,
+    Object? arguments,
+    String? restorationId,
+    bool? fullscreenDialog,
+  }) {
+    _sidePageConfigs.clear();
+
+    _sidePageConfigs.add(
+      _PageConfig(
+        child: page,
+        name: title,
+        arguments: arguments,
+        restorationId: restorationId,
+        fullscreenDialog: fullscreenDialog,
+      ),
+    );
+
+    setState(_markDirty);
+  }
+
+  /// Clears all pages in the side view.
+  void clearSide() {
+    _sidePageConfigs.clear();
+
+    setState(_markDirty);
+  }
+
+  bool get isSplitted {
     return _splitted;
   }
 
-  void _updatePages() {
+  void _markDirty() {
+    _dirty = true;
+  }
+
+  void _updatePagesIfNeeded() {
+    if (_dirty) {
+      _dirty = false;
+    }
+
+    if (_splitted) {
+      _mainPages = _buildPages(_mainPageConfigs);
+      _sidePages = _buildPages(_sidePageConfigs);
+    } else {
+      _mainPages = _buildPages([..._mainPageConfigs, ..._sidePageConfigs]);
+      _sidePages = [];
+    }
+  }
+
+  List<Page> _buildPages(List<_PageConfig> pageConfigs) {
     final pages = <Page>[];
-    for (var i = 0; i < _pageConfigs.length; i++) {
-      final pageConfig = _pageConfigs[i];
+    for (var i = 0; i < pageConfigs.length; i++) {
+      final pageConfig = pageConfigs[i];
       final pageKey = ValueKey(i);
       final page = widget.pageBuilder(
         key: pageKey,
@@ -299,15 +378,32 @@ class SplitViewState extends State<SplitView> {
       );
       pages.add(page);
     }
-    _pages = pages;
+    return pages;
   }
 
-  bool _onPopPage(Route<dynamic> route, dynamic result) {
-    if (_pages.length <= 1) {
+  bool _onPopTop(Route<dynamic> route, dynamic result) {
+    return _onPopSide(route, result) || _onPopMain(route, result);
+  }
+
+  bool _onPopMain(Route<dynamic> route, dynamic result) {
+    print('_onPopMain');
+    if (_mainPageConfigs.length <= 1) {
       return false;
     }
     if (route.didPop(result)) {
-      _pages.removeLast();
+      _mainPageConfigs.removeLast();
+      return true;
+    }
+    return false;
+  }
+
+  bool _onPopSide(Route<dynamic> route, dynamic result) {
+    print('_onPopSide');
+    if (_sidePageConfigs.isEmpty) {
+      return false;
+    }
+    if (route.didPop(result)) {
+      _sidePageConfigs.removeLast();
       return true;
     }
     return false;

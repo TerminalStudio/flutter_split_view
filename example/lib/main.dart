@@ -38,7 +38,7 @@ class MainPage extends StatelessWidget {
         child: ElevatedButton(
           child: Text('click'),
           onPressed: () {
-            SplitView.of(context).setSecondary(
+            SplitView.of(context).setSide(
               SecondPage(),
               title: 'Second',
             );
@@ -75,7 +75,7 @@ class SecondPage extends StatelessWidget {
               ElevatedButton(
                 child: Text('forward'),
                 onPressed: () {
-                  SplitView.of(context).push(
+                  SplitView.of(context).pushSide(
                     ThirdPage(),
                     title: 'Third',
                   );
@@ -105,7 +105,7 @@ class ThirdPage extends StatelessWidget {
           return ElevatedButton(
             child: Text('back'),
             onPressed: () {
-              SplitView.of(context).pop();
+              Navigator.of(context).pop();
             },
           );
         }),
