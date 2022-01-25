@@ -1,3 +1,7 @@
+## 0.1.2
+
+* `_updatePages` after pop
+
 ## 0.1.1
 
 * Fix pop

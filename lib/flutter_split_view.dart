@@ -308,6 +308,7 @@ class SplitViewState extends State<SplitView> {
     }
     if (route.didPop(result)) {
       _pageConfigs.removeLast();
+      _updatePages();
       return true;
     }
     return false;
