@@ -1,6 +1,6 @@
 name: flutter_split_view
 description: Flutter widget that automatically splits the screen into two views based on available space. This is based on Navigator 2.0.
-version: 1.0.0-pre
+version: 1.0.1-pre
 homepage: https://github.com/TerminalStudio/flutter_split_view
 
 environment:

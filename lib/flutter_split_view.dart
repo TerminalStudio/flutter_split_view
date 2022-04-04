@@ -146,6 +146,10 @@ class SplitViewState extends State<SplitView> {
   /// Whether the configuration has changed and the pages need to be rebuilt.
   var _dirty = true;
 
+  final _mainViewKey = GlobalKey();
+
+  final _sideViewKey = GlobalKey();
+
   @override
   void initState() {
     _mainPageConfigs.add(
@@ -167,6 +171,7 @@ class SplitViewState extends State<SplitView> {
 
         if (!_splitted) {
           return Navigator(
+            key: _mainViewKey,
             pages: _mainPages,
             onPopPage: _onPopTop,
           );
@@ -176,9 +181,12 @@ class SplitViewState extends State<SplitView> {
           children: <Widget>[
             SizedBox(
               width: widget.childWidth,
-              child: Navigator(
-                pages: _mainPages,
-                onPopPage: _onPopMain,
+              child: ClipRRect(
+                child: Navigator(
+                  key: _mainViewKey,
+                  pages: _mainPages,
+                  onPopPage: _onPopMain,
+                ),
               ),
             ),
             const VerticalDivider(
@@ -202,6 +210,7 @@ class SplitViewState extends State<SplitView> {
     }
 
     return Navigator(
+      key: _sideViewKey,
       pages: _sidePages,
       onPopPage: _onPopSide,
     );

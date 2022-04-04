@@ -1,3 +1,7 @@
+# 1.0.1-pre
+
+* Use GlobalKey to preserve state
+
 ## 1.0.0-pre
 
 * v2
