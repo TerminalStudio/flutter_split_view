@@ -1,3 +1,7 @@
+# 1.0.2-pre
+
+* Use `maybePop`.
+
 # 1.0.1-pre
 
 * Use GlobalKey to preserve state

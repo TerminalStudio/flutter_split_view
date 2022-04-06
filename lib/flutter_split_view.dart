@@ -146,9 +146,9 @@ class SplitViewState extends State<SplitView> {
   /// Whether the configuration has changed and the pages need to be rebuilt.
   var _dirty = true;
 
-  final _mainViewKey = GlobalKey();
+  final _mainNavigatorKey = GlobalKey<NavigatorState>();
 
-  final _sideViewKey = GlobalKey();
+  final _sideNavigatorKey = GlobalKey<NavigatorState>();
 
   @override
   void initState() {
@@ -171,7 +171,7 @@ class SplitViewState extends State<SplitView> {
 
         if (!_splitted) {
           return Navigator(
-            key: _mainViewKey,
+            key: _mainNavigatorKey,
             pages: _mainPages,
             onPopPage: _onPopTop,
           );
@@ -183,7 +183,7 @@ class SplitViewState extends State<SplitView> {
               width: widget.childWidth,
               child: ClipRRect(
                 child: Navigator(
-                  key: _mainViewKey,
+                  key: _mainNavigatorKey,
                   pages: _mainPages,
                   onPopPage: _onPopMain,
                 ),
@@ -210,7 +210,7 @@ class SplitViewState extends State<SplitView> {
     }
 
     return Navigator(
-      key: _sideViewKey,
+      key: _sideNavigatorKey,
       pages: _sidePages,
       onPopPage: _onPopSide,
     );
@@ -259,34 +259,32 @@ class SplitViewState extends State<SplitView> {
   }
 
   /// Pop a page from the top of the stack.
-  bool pop() {
-    return popSide() || popMain();
+  Future<bool> maybePop() async {
+    return await maybePopSide() || await maybePopMain();
   }
 
   /// Pop a page from the top of the main view.
-  bool popMain() {
-    if (_mainPageConfigs.length <= 1) {
-      return false;
-    }
-
-    _mainPageConfigs.removeLast();
-
-    setState(_markDirty);
-
-    return true;
+  void popMain() {
+    _mainNavigatorKey.currentState?.pop();
   }
 
   /// Pop a page from the side view.
-  bool popSide() {
-    if (_sidePageConfigs.isEmpty) {
+  void popSide() {
+    _sideNavigatorKey.currentState?.pop();
+  }
+
+  /// Pop a page from the top of the main view.
+  Future<bool> maybePopMain() {
+    return _mainNavigatorKey.currentState!.maybePop();
+  }
+
+  /// Potentially pop a page from the top of the side view.
+  Future<bool> maybePopSide() async {
+    final state = _sideNavigatorKey.currentState;
+    if (state == null) {
       return false;
     }
-
-    _sidePageConfigs.removeLast();
-
-    setState(_markDirty);
-
-    return true;
+    return state.maybePop();
   }
 
   /// Number of pages in the stack.
