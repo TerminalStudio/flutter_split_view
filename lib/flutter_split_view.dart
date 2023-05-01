@@ -76,6 +76,7 @@ class SplitView extends StatefulWidget {
     this.breakpoint = _kDefaultBreakpoint,
     this.placeholder,
     this.title,
+    this.hideDivider
   })  : pageBuilder = _materialPageBuilder,
         super(key: key);
 
@@ -86,6 +87,7 @@ class SplitView extends StatefulWidget {
     this.breakpoint = _kDefaultBreakpoint,
     this.placeholder,
     this.title,
+    this.hideDivider
   })  : pageBuilder = _cupertinoPageBuilder,
         super(key: key);
 
@@ -97,6 +99,7 @@ class SplitView extends StatefulWidget {
     this.placeholder,
     this.title,
     required this.pageBuilder,
+    this.hideDivider
   }) : super(key: key);
 
   static SplitViewState of(BuildContext context) {
@@ -122,6 +125,9 @@ class SplitView extends StatefulWidget {
   final Widget? placeholder;
 
   final PageBuilder pageBuilder;
+
+  /// If true hides the vertical divider
+  final bool? hideDivider;
 
   @override
   SplitViewState createState() => SplitViewState();
@@ -165,7 +171,7 @@ class SplitViewState extends State<SplitView> {
                 onPopPage: _onPopPage,
               ),
             ),
-            const VerticalDivider(
+            if (!(widget.hideDivider == true)) const VerticalDivider(
               width: 0,
             ),
             Expanded(
