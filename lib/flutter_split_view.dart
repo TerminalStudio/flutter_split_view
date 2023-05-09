@@ -16,6 +16,16 @@ typedef PageBuilder = Page Function({
   bool? fullscreenDialog,
 });
 
+class FlexWidth {
+  final int mainViewFlexWidth;
+  final int secondaryViewFlexWidth;
+
+  const FlexWidth({
+    required this.mainViewFlexWidth,
+    required this.secondaryViewFlexWidth
+  });
+}
+
 MaterialPage<void> _materialPageBuilder({
   required LocalKey key,
   required Widget child,
@@ -75,6 +85,7 @@ class SplitView extends StatefulWidget {
     this.childWidth = _kDefaultWidth,
     this.breakpoint = _kDefaultBreakpoint,
     this.placeholder,
+    this.flexWidth,
     this.title,
     this.hideDivider
   })  : pageBuilder = _materialPageBuilder,
@@ -86,6 +97,7 @@ class SplitView extends StatefulWidget {
     this.childWidth = _kDefaultWidth,
     this.breakpoint = _kDefaultBreakpoint,
     this.placeholder,
+    this.flexWidth,
     this.title,
     this.hideDivider
   })  : pageBuilder = _cupertinoPageBuilder,
@@ -97,6 +109,7 @@ class SplitView extends StatefulWidget {
     this.childWidth = _kDefaultWidth,
     this.breakpoint = _kDefaultBreakpoint,
     this.placeholder,
+    this.flexWidth,
     this.title,
     required this.pageBuilder,
     this.hideDivider
@@ -116,6 +129,10 @@ class SplitView extends StatefulWidget {
 
   /// Width of the child when it is in the main view.
   final double childWidth;
+
+  /// Width of the child when it is in the main view. If set the SizedBox will be
+  /// replaced with an Extended widget
+  final FlexWidth? flexWidth;
 
   /// Title of the root page, used for the back button in Cupertino.
   final String? title;
@@ -164,8 +181,15 @@ class SplitViewState extends State<SplitView> {
 
         return Row(
           children: <Widget>[
-            SizedBox(
+            if (widget.flexWidth == null) SizedBox(
               width: widget.childWidth,
+              child: Navigator(
+                pages: [_pages.first],
+                onPopPage: _onPopPage,
+              ),
+            ),
+            if (widget.flexWidth != null) Expanded(
+              flex: widget.flexWidth!.mainViewFlexWidth,
               child: Navigator(
                 pages: [_pages.first],
                 onPopPage: _onPopPage,
@@ -175,6 +199,9 @@ class SplitViewState extends State<SplitView> {
               width: 0,
             ),
             Expanded(
+              flex: widget.flexWidth != null  
+                ? widget.flexWidth!.secondaryViewFlexWidth
+                : 1,
               child: ClipRect(
                 clipBehavior: Clip.hardEdge,
                 child: _buildSecondaryView(),
